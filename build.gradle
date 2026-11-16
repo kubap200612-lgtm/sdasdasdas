@@ -1,0 +1,35 @@
+plugins {
+    id 'fabric-loom' version '1.9-SNAPSHOT'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+// Zabezpieczenie: gdy w repo brakuje plikow moda (np. pliki .java wgrane luzem, bez folderow src/main/java/...),
+// build konczy sie bledem z opisem zamiast robic pusty jar (ok. 1 KB).
+['src/main/java/pl/rynekanaliza/RynekAnalizaMod.java', 'src/main/resources/fabric.mod.json'].each { p ->
+    if (!file(p).exists()) {
+        throw new GradleException("Brak pliku ${p}. Folder src jest niepelny albo w zlym miejscu - wgraj caly folder src z paczki (przeciagnij folder, nie pojedyncze pliki).")
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
